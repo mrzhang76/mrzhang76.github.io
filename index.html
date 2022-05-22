@@ -123,7 +123,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">1</span>
+          <span class="site-state-item-count">2</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -157,6 +157,81 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/05/22/hexo-next%E5%8D%9A%E5%AE%A2%E9%83%A8%E7%BD%B2%E9%81%87%E5%88%B0%E7%9A%84%E5%9D%91/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="mrzhang76">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="七十六号工坊">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 七十六号工坊">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2022/05/22/hexo-next%E5%8D%9A%E5%AE%A2%E9%83%A8%E7%BD%B2%E9%81%87%E5%88%B0%E7%9A%84%E5%9D%91/" class="post-title-link" itemprop="url">hexo next博客部署遇到的坑</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2022-05-22 20:41:12 / 修改时间：21:37:51" itemprop="dateCreated datePublished" datetime="2022-05-22T20:41:12+08:00">2022-05-22</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <blockquote>
+<p>通往目标的道路就是从一个坑摔到另一个坑中，直到摔到终点。</p>
+</blockquote>
+<h2 id="github-page无法正常实行页面识别"><a href="#github-page无法正常实行页面识别" class="headerlink" title="github page无法正常实行页面识别"></a>github page无法正常实行页面识别</h2><p>hexo默认生成的页面结构中不包含必须的README.md文件，需要自行添加到source目录中，并将_config.yml文件中的skip_render参数设置为README.md，hexo在渲染时就会跳过该文件。</p>
+<h2 id="页面因jsdelivr无法使用打开为空白"><a href="#页面因jsdelivr无法使用打开为空白" class="headerlink" title="页面因jsdelivr无法使用打开为空白"></a>页面因jsdelivr无法使用打开为空白</h2><p>因种种原因，jsdelivr无法使用，需要在_config.next.yml中设置plugins参数为custom，并设置相应的custom_cdn_url。  </p>
+<p>笔者使用了cloudflare代替jsdelivr。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
