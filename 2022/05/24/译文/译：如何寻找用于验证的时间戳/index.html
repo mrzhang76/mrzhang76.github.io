@@ -23,7 +23,7 @@
     <meta name="description" content="原文地址：https:&#x2F;&#x2F;nixintel.info&#x2F;osint&#x2F;how-to-find-timestamps-for-verification&#x2F; 文章原名：How To Find Timestamps For Verification 作者： Nixintel  对于网络侦探(internet investigator)来说，能准确证明数据是什么时候发布在互联网上属于一种核心技能。如果你想能证">
 <meta property="og:type" content="article">
 <meta property="og:title" content="译：如何寻找用于验证的时间戳">
-<meta property="og:url" content="https://mrzhang76.com/2022/05/24/%E8%AF%91%EF%BC%9A%E5%A6%82%E4%BD%95%E5%AF%BB%E6%89%BE%E7%94%A8%E4%BA%8E%E9%AA%8C%E8%AF%81%E7%9A%84%E6%97%B6%E9%97%B4%E6%88%B3/index.html">
+<meta property="og:url" content="https://mrzhang76.com/2022/05/24/%E8%AF%91%E6%96%87/%E8%AF%91%EF%BC%9A%E5%A6%82%E4%BD%95%E5%AF%BB%E6%89%BE%E7%94%A8%E4%BA%8E%E9%AA%8C%E8%AF%81%E7%9A%84%E6%97%B6%E9%97%B4%E6%88%B3/index.html">
 <meta property="og:site_name" content="七十六号工坊">
 <meta property="og:description" content="原文地址：https:&#x2F;&#x2F;nixintel.info&#x2F;osint&#x2F;how-to-find-timestamps-for-verification&#x2F; 文章原名：How To Find Timestamps For Verification 作者： Nixintel  对于网络侦探(internet investigator)来说，能准确证明数据是什么时候发布在互联网上属于一种核心技能。如果你想能证">
 <meta property="og:locale" content="zh_CN">
@@ -49,11 +49,11 @@
 <meta name="twitter:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/image-15.png">
 
 
-<link rel="canonical" href="https://mrzhang76.com/2022/05/24/%E8%AF%91%EF%BC%9A%E5%A6%82%E4%BD%95%E5%AF%BB%E6%89%BE%E7%94%A8%E4%BA%8E%E9%AA%8C%E8%AF%81%E7%9A%84%E6%97%B6%E9%97%B4%E6%88%B3/">
+<link rel="canonical" href="https://mrzhang76.com/2022/05/24/%E8%AF%91%E6%96%87/%E8%AF%91%EF%BC%9A%E5%A6%82%E4%BD%95%E5%AF%BB%E6%89%BE%E7%94%A8%E4%BA%8E%E9%AA%8C%E8%AF%81%E7%9A%84%E6%97%B6%E9%97%B4%E6%88%B3/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://mrzhang76.com/2022/05/24/%E8%AF%91%EF%BC%9A%E5%A6%82%E4%BD%95%E5%AF%BB%E6%89%BE%E7%94%A8%E4%BA%8E%E9%AA%8C%E8%AF%81%E7%9A%84%E6%97%B6%E9%97%B4%E6%88%B3/","path":"2022/05/24/译：如何寻找用于验证的时间戳/","title":"译：如何寻找用于验证的时间戳"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://mrzhang76.com/2022/05/24/%E8%AF%91%E6%96%87/%E8%AF%91%EF%BC%9A%E5%A6%82%E4%BD%95%E5%AF%BB%E6%89%BE%E7%94%A8%E4%BA%8E%E9%AA%8C%E8%AF%81%E7%9A%84%E6%97%B6%E9%97%B4%E6%88%B3/","path":"2022/05/24/译文/译：如何寻找用于验证的时间戳/","title":"译：如何寻找用于验证的时间戳"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>译：如何寻找用于验证的时间戳 | 七十六号工坊</title>
@@ -144,7 +144,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-count">9</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -202,7 +202,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://mrzhang76.com/2022/05/24/%E8%AF%91%EF%BC%9A%E5%A6%82%E4%BD%95%E5%AF%BB%E6%89%BE%E7%94%A8%E4%BA%8E%E9%AA%8C%E8%AF%81%E7%9A%84%E6%97%B6%E9%97%B4%E6%88%B3/">
+    <link itemprop="mainEntityOfPage" href="https://mrzhang76.com/2022/05/24/%E8%AF%91%E6%96%87/%E8%AF%91%EF%BC%9A%E5%A6%82%E4%BD%95%E5%AF%BB%E6%89%BE%E7%94%A8%E4%BA%8E%E9%AA%8C%E8%AF%81%E7%9A%84%E6%97%B6%E9%97%B4%E6%88%B3/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -334,12 +334,12 @@
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2022/05/22/TCL-C-%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%EF%BC%88windows-vs2022-tcl8-6%EF%BC%89/" rel="prev" title="TCL C++ 开发环境搭建（windows vs2022 tcl8.6）">
+                <a href="/2022/05/22/%E6%8A%80%E6%9C%AF/TCL-C-%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%EF%BC%88windows-vs2022-tcl8-6%EF%BC%89/" rel="prev" title="TCL C++ 开发环境搭建（windows vs2022 tcl8.6）">
                   <i class="fa fa-chevron-left"></i> TCL C++ 开发环境搭建（windows vs2022 tcl8.6）
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2022/05/25/%E8%AF%91%EF%BC%9ACarbon14-%E6%B5%8B%E7%AE%97%E7%BD%91%E7%AB%99%E7%9A%84%E5%B9%B4%E9%BE%84/" rel="next" title="译：Carbon14-测算网站的年龄">
+                <a href="/2022/05/25/%E8%AF%91%E6%96%87/%E8%AF%91%EF%BC%9ACarbon14-%E6%B5%8B%E7%AE%97%E7%BD%91%E7%AB%99%E7%9A%84%E5%B9%B4%E9%BE%84/" rel="next" title="译：Carbon14-测算网站的年龄">
                   译：Carbon14-测算网站的年龄 <i class="fa fa-chevron-right"></i>
                 </a>
             </div>

@@ -20,28 +20,32 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"mrzhang76.com","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="知行合一  人这一辈子，总是要认识世界，试图改变世界的。 认识世界尚属不易，非佼佼者更难谈改变世界了。 既然没可能改变这个世界，那就留下对这个世界的认识。 人这一辈子，总是要留下些什么的，这大抵就是这样做的意义。">
+    <meta name="description" content="原文地址：https:&#x2F;&#x2F;nixintel.info&#x2F;osint&#x2F;search-tip-finding-historic-whois-data&#x2F; 文章原名：Search Tip: Finding Historic WhoIs Data 作者： Nixintel  对于OSINT侦探来说，WHOIS简直是一座金矿。总是能在里面找到网站所有者或注册人的地址、电话号码、email等信息。然而，随着越来">
 <meta property="og:type" content="article">
-<meta property="og:title" content="为什么我们需要博客">
-<meta property="og:url" content="https://mrzhang76.com/2022/05/22/%E4%B8%BA%E4%BB%80%E4%B9%88%E6%88%91%E4%BB%AC%E9%9C%80%E8%A6%81%E5%8D%9A%E5%AE%A2/index.html">
+<meta property="og:title" content="译：侦探技巧-寻找历史WHOIS数据">
+<meta property="og:url" content="https://mrzhang76.com/2022/06/02/%E8%AF%91%E6%96%87/%E8%AF%91%EF%BC%9A%E4%BE%A6%E6%8E%A2%E6%8A%80%E5%B7%A7-%E5%AF%BB%E6%89%BE%E5%8E%86%E5%8F%B2WHOIS%E6%95%B0%E6%8D%AE/index.html">
 <meta property="og:site_name" content="七十六号工坊">
-<meta property="og:description" content="知行合一  人这一辈子，总是要认识世界，试图改变世界的。 认识世界尚属不易，非佼佼者更难谈改变世界了。 既然没可能改变这个世界，那就留下对这个世界的认识。 人这一辈子，总是要留下些什么的，这大抵就是这样做的意义。">
+<meta property="og:description" content="原文地址：https:&#x2F;&#x2F;nixintel.info&#x2F;osint&#x2F;search-tip-finding-historic-whois-data&#x2F; 文章原名：Search Tip: Finding Historic WhoIs Data 作者： Nixintel  对于OSINT侦探来说，WHOIS简直是一座金矿。总是能在里面找到网站所有者或注册人的地址、电话号码、email等信息。然而，随着越来">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-05-22T06:41:28.000Z">
-<meta property="article:modified_time" content="2022-05-22T13:55:47.106Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202206020916663.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202206020916604.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202206020916553.png">
+<meta property="article:published_time" content="2022-06-02T00:21:36.000Z">
+<meta property="article:modified_time" content="2022-06-02T01:30:02.973Z">
 <meta property="article:author" content="mrzhang76">
-<meta property="article:tag" content="随笔">
+<meta property="article:tag" content="OSINT">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202206020916663.png">
 
 
-<link rel="canonical" href="https://mrzhang76.com/2022/05/22/%E4%B8%BA%E4%BB%80%E4%B9%88%E6%88%91%E4%BB%AC%E9%9C%80%E8%A6%81%E5%8D%9A%E5%AE%A2/">
+<link rel="canonical" href="https://mrzhang76.com/2022/06/02/%E8%AF%91%E6%96%87/%E8%AF%91%EF%BC%9A%E4%BE%A6%E6%8E%A2%E6%8A%80%E5%B7%A7-%E5%AF%BB%E6%89%BE%E5%8E%86%E5%8F%B2WHOIS%E6%95%B0%E6%8D%AE/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://mrzhang76.com/2022/05/22/%E4%B8%BA%E4%BB%80%E4%B9%88%E6%88%91%E4%BB%AC%E9%9C%80%E8%A6%81%E5%8D%9A%E5%AE%A2/","path":"2022/05/22/为什么我们需要博客/","title":"为什么我们需要博客"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://mrzhang76.com/2022/06/02/%E8%AF%91%E6%96%87/%E8%AF%91%EF%BC%9A%E4%BE%A6%E6%8E%A2%E6%8A%80%E5%B7%A7-%E5%AF%BB%E6%89%BE%E5%8E%86%E5%8F%B2WHOIS%E6%95%B0%E6%8D%AE/","path":"2022/06/02/译文/译：侦探技巧-寻找历史WHOIS数据/","title":"译：侦探技巧-寻找历史WHOIS数据"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>为什么我们需要博客 | 七十六号工坊</title>
+<title>译：侦探技巧-寻找历史WHOIS数据 | 七十六号工坊</title>
   
 
 
@@ -128,7 +132,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-count">9</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -186,7 +190,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://mrzhang76.com/2022/05/22/%E4%B8%BA%E4%BB%80%E4%B9%88%E6%88%91%E4%BB%AC%E9%9C%80%E8%A6%81%E5%8D%9A%E5%AE%A2/">
+    <link itemprop="mainEntityOfPage" href="https://mrzhang76.com/2022/06/02/%E8%AF%91%E6%96%87/%E8%AF%91%EF%BC%9A%E4%BE%A6%E6%8E%A2%E6%8A%80%E5%B7%A7-%E5%AF%BB%E6%89%BE%E5%8E%86%E5%8F%B2WHOIS%E6%95%B0%E6%8D%AE/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -199,12 +203,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="为什么我们需要博客 | 七十六号工坊">
+      <meta itemprop="name" content="译：侦探技巧-寻找历史WHOIS数据 | 七十六号工坊">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          为什么我们需要博客
+          译：侦探技巧-寻找历史WHOIS数据
         </h1>
 
         <div class="post-meta-container">
@@ -216,7 +220,7 @@
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2022-05-22 14:41:28 / 修改时间：21:55:47" itemprop="dateCreated datePublished" datetime="2022-05-22T14:41:28+08:00">2022-05-22</time>
+      <time title="创建时间：2022-06-02 08:21:36 / 修改时间：09:30:02" itemprop="dateCreated datePublished" datetime="2022-06-02T08:21:36+08:00">2022-06-02</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -224,7 +228,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E9%9A%8F%E7%AC%94/" itemprop="url" rel="index"><span itemprop="name">随笔</span></a>
+          <a href="/categories/%E5%8D%9A%E6%96%87%E7%BF%BB%E8%AF%91/" itemprop="url" rel="index"><span itemprop="name">博文翻译</span></a>
         </span>
     </span>
 
@@ -239,12 +243,32 @@
     
     <div class="post-body" itemprop="articleBody">
         <blockquote>
-<p>知行合一</p>
+<p>原文地址：<a target="_blank" rel="noopener" href="https://nixintel.info/osint/search-tip-finding-historic-whois-data/">https://nixintel.info/osint/search-tip-finding-historic-whois-data/</a></p>
+<p>文章原名：Search Tip: Finding Historic WhoIs Data</p>
+<p>作者： Nixintel</p>
 </blockquote>
-<p>人这一辈子，总是要认识世界，试图改变世界的。</p>
-<p>认识世界尚属不易，非佼佼者更难谈改变世界了。</p>
-<p>既然没可能改变这个世界，那就留下对这个世界的认识。</p>
-<p>人这一辈子，总是要留下些什么的，这大抵就是这样做的意义。</p>
+<p>对于OSINT侦探来说，WHOIS简直是一座金矿。总是能在里面找到网站所有者或注册人的地址、电话号码、email等信息。然而，随着越来越多的域名注册商提供了隐私服务，以及GDPR（通用数据保护条例）的推广，大大降低了WHOIS服务作为OSINT工具的实用性。</p>
+<p>不过，可以利用 <a target="_blank" rel="noopener" href="https://archive.org/">Wayback Machine</a>的力量来查找在隐私保护和GDPR推广之前的历史WHOIS数据。将 <a target="_blank" rel="noopener" href="https://archive.org/">Wayback Machine</a>与Who.is获取到的信息相结合，以确定使用正确的URL来查找WHOIS历史记录。</p>
+<p>在此例中，我将查找最近破产的旅行社 <a target="_blank" rel="noopener" href="https://www.thomascook.com/">thomascook.com</a>的WHOIS信息。这是该域的当前WHOIS信息：</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202206020916663.png" alt="img"></p>
+<p>如果我们想使用WHOIS开始研究该公司，它并没有真正提供任何有用的信息。有个关于Comlaude的详细联系信息，这是一家为大型企业注册域名的服务商，但没有太多其他有用的信息供开源侦探所用。不要止步于此，Wayback Machine将帮助我们回溯时间到域名隐私保护被重视之前。</p>
+<p>从 who.is 查找 WHOIS 的 URL 始终采用以下格式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://who.is/whois/example.com</span><br></pre></td></tr></table></figure>
+
+<p>当在Wayback Machine 搜索存档页面时，URL始终采用以下格式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://web.archive.org/web/*/https://example.com</span><br></pre></td></tr></table></figure>
+
+<p>因此，将二者结合就可以得出用于搜索任何给定网站的WHOIS历史记录的URL格式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://web.archive.org/web/*/https://who.is/whois/example.com</span><br></pre></td></tr></table></figure>
+
+<p>所以，当我想搜索 <a target="_blank" rel="noopener" href="https://thomascook.com/">thomascook.com</a>的历史记录，将使用以下URL：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://web.archive.org/web/*/https://who.is/whois/thomascook.com</span><br></pre></td></tr></table></figure>
+
+<p>不出所料，它返回了GDPR前时代的结果：</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202206020916604.png" alt="img"></p>
+<p>这是在案的最早WHOIS记录：</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202206020916553.png" alt="img"></p>
+<p>使用这种技术可以发现一个真实的姓名、一个实际地址和一个常规的固定电话号码——所有这些都是进一步探索的绝佳起点。即使这个人的电子邮件地址是模糊的，但我们已经知道该域名，可以很容易地使用像 Hunter.io 这样的工具来猜测出他们最有可能的电子邮件地址是什么。这与我们仅依赖最新的注册商信息相比，从历史WHOIS得出的结果要好得多。</p>
 
     </div>
 
@@ -254,17 +278,20 @@
 
     <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E9%9A%8F%E7%AC%94/" rel="tag"># 随笔</a>
+              <a href="/tags/OSINT/" rel="tag"># OSINT</a>
           </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
+                <a href="/2022/05/30/%E8%AF%91%E6%96%87/%E8%AF%91%EF%BC%9A%E7%BD%91%E7%AB%99OSINT-Antifa-com%E4%B8%8ER%E5%9B%BD%E7%9B%B8%E5%85%B3%E5%90%97%EF%BC%9F/" rel="prev" title="译：网站OSINT-Antifa.com与R国相关吗？">
+                  <i class="fa fa-chevron-left"></i> 译：网站OSINT-Antifa.com与R国相关吗？
+                </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2022/05/22/hexo-next%E5%8D%9A%E5%AE%A2%E9%83%A8%E7%BD%B2%E9%81%87%E5%88%B0%E7%9A%84%E5%9D%91/" rel="next" title="hexo next博客部署遇到的坑">
-                  hexo next博客部署遇到的坑 <i class="fa fa-chevron-right"></i>
+                <a href="/2022/06/02/%E8%AF%91%E6%96%87/%E8%AF%91%EF%BC%9A%E6%97%A0WHOIS%E4%BF%A1%E6%81%AF%E7%9A%84%E7%BD%91%E7%AB%99%E6%89%80%E6%9C%89%E6%9D%83%E8%BF%BD%E8%B8%AA-%E9%80%9A%E8%BF%87%E5%8F%8D%E5%90%91IP%E6%9F%A5%E8%AF%A2/" rel="next" title="译：无WHOIS信息的网站所有权追踪-通过反向IP查询">
+                  译：无WHOIS信息的网站所有权追踪-通过反向IP查询 <i class="fa fa-chevron-right"></i>
                 </a>
             </div>
           </div>
