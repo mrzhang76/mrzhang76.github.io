@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"mrzhang76.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="原文地址：https:&#x2F;&#x2F;nixintel.info&#x2F;osint&#x2F;website-attribution-cloudflare-v-cloudflair&#x2F; 文章原名：Website Attribution – Cloudflare v Cloudflair 作者： Nixintel  长时间以来，我一直想写一个关于WHOIS的消亡与调查员在确定隐藏在层层混淆与迷雾后非法网站的运营与所有者时面临困">
+<meta property="og:type" content="article">
+<meta property="og:title" content="译：网站追踪-Cloudflare与Cloudflair的对抗">
+<meta property="og:url" content="https://mrzhang76.github.io/%E8%AF%91%EF%BC%9A%E7%BD%91%E7%AB%99%E8%BF%BD%E8%B8%AA-Cloudflare%E4%B8%8ECloudflair%E7%9A%84%E5%AF%B9%E6%8A%97/">
+<meta property="og:site_name" content="七十六号工坊">
+<meta property="og:description" content="原文地址：https:&#x2F;&#x2F;nixintel.info&#x2F;osint&#x2F;website-attribution-cloudflare-v-cloudflair&#x2F; 文章原名：Website Attribution – Cloudflare v Cloudflair 作者： Nixintel  长时间以来，我一直想写一个关于WHOIS的消亡与调查员在确定隐藏在层层混淆与迷雾后非法网站的运营与所有者时面临困">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-06-03T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-19T11:05:29.063Z">
+<meta property="article:author" content="Mrzhang76">
+<meta property="article:tag" content="OSINT">
+<meta property="article:tag" content="翻译">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://mrzhang76.github.io/%E8%AF%91%EF%BC%9A%E7%BD%91%E7%AB%99%E8%BF%BD%E8%B8%AA-Cloudflare%E4%B8%8ECloudflair%E7%9A%84%E5%AF%B9%E6%8A%97/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-cn'
+  };
+</script>
+
+  <title>译：网站追踪-Cloudflare与Cloudflair的对抗 | 七十六号工坊</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">七十六号工坊</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-cn">
+    <link itemprop="mainEntityOfPage" href="https://mrzhang76.github.io/%E8%AF%91%EF%BC%9A%E7%BD%91%E7%AB%99%E8%BF%BD%E8%B8%AA-Cloudflare%E4%B8%8ECloudflair%E7%9A%84%E5%AF%B9%E6%8A%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Mrzhang76">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="七十六号工坊">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          译：网站追踪-Cloudflare与Cloudflair的对抗
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2022-06-04 00:00:00" itemprop="dateCreated datePublished" datetime="2022-06-04T00:00:00+08:00">2022-06-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-02-19 19:05:29" itemprop="dateModified" datetime="2024-02-19T19:05:29+08:00">2024-02-19</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>原文地址：<a target="_blank" rel="noopener" href="https://nixintel.info/osint/website-attribution-cloudflare-v-cloudflair/">https://nixintel.info/osint/website-attribution-cloudflare-v-cloudflair/</a></p>
+<p>文章原名：Website Attribution – Cloudflare v Cloudflair</p>
+<p>作者： Nixintel</p>
+</blockquote>
+<p>长时间以来，我一直想写一个关于WHOIS的消亡与调查员在确定隐藏在层层混淆与迷雾后非法网站的运营与所有者时面临困难的文章。没有所谓的完美解决方案，但有很多方法可以帮助网站所有权的鉴别，尤其是在与其他信息链结合后。</p>
+<p>任何试图调查可疑网站的人无疑都会在某个时候遇到 <a target="_blank" rel="noopener" href="https://www.cloudflare.com/en-gb/">Cloudflare</a> 。（我必须强调一下，Cloudflare是一家合法且有用的服务商，它的海量网络资源为网站提供了对DDOS以及其他安全威胁的防护。）用<a target="_blank" rel="noopener" href="https://dnslytics.com/">DNSLytics</a>或<a target="_blank" rel="noopener" href="https://dnslytics.com/">CentralOps</a>等服务查询托管于Cloudflare的任何域名，你得到的只是Cloudflare服务器的IP地址和无关信息。你无法看到谁是域名的真正主人，或它的真实IP地址是什么。</p>
+<h2 id="使用Cloudflair"><a href="#使用Cloudflair" class="headerlink" title="使用Cloudflair"></a>使用Cloudflair</h2><p>由<a target="_blank" rel="noopener" href="https://blog.christophetd.fr/">Christophe Tafani-Dereeper</a>制作的Cloudflair是一款强大的工具，可用于探索隐藏在Cloudflare后的恶意域。其工作原理基于域的SSL证书，每个使用HTTPS的域都有一个唯一的SSL安全证书，通过在互联网上查找证书来确定目标真实IP地址。它还能识别使用同一证书的其他IP地址，无论这些IP地址是否隐藏在Cloudflare后。</p>
+<p>假如我运营了一个犯罪网站**<a target="_blank" rel="noopener" href="http://www.humantrafficking.org/">www.humantrafficking.org</a>*<em>并使用Cloudflare进行保护，任何进行<a target="_blank" rel="noopener" href="https://www.whois.com.au/whois/dns.html">DNS逆向或WHOIS查询</a>的人只能看到Cloudflare的信息，关于我的域名的真实信息被隐藏了起来。尽管我的真实IP地址是 45.64.244.13</em> 并且我的真实网络主机是 Evildude Web Enterprises，但呈现给调查员的 IP 地址将类似于104.28.13.49（一个真实的 Cloudflare IP）。</p>
+<p>尽管如此，类似<a target="_blank" rel="noopener" href="https://censys.io/">Censys</a>的网络爬虫将记录其遇到的每一个SLL证书的详细信息和相关的IP地址。这意味着，尽管人们浏览我的邪恶网站或者进行WHOIS&#x2F;DNS查找只会找到Cloudflare IP 104.28.13.49，Censys也将收录真实的IP地址45.64.244.13，并记录同一域的相同SSL证书链接到两个IP的事实。换句话说，只要网站的真实 IP 地址对 Internet 可见，Censys 就能够找到并记录它，尽管有 Cloudflare。Cloudflair只需获取你感兴趣的域名的详细信息，然后使用Censys进行检查，并显示与特定域名相关的所有IP地址，无论它们是否在Cloudflare后面。在作者的<a target="_blank" rel="noopener" href="https://blog.christophetd.fr/bypassing-cloudflare-using-internet-wide-scan-data/">博客</a>上有关于这一切如何运作的更详细的解释。</p>
+<h3 id="安装并运行Cloudflair"><a href="#安装并运行Cloudflair" class="headerlink" title="安装并运行Cloudflair"></a>安装并运行<strong>Cloudflair</strong></h3><p>Cloudflair在Linux环境下运行最佳，因为其预装了Python。可以通过命令行安装或直接从Docker镜像运行。但我发现，在使用命令行运行时，存在一些Python库冲突和问题，但使用Docker镜像容易的多，因此我建议使用Docker镜像。虽然我对于Docker的使用并不熟练，但我发现Cloudflair运行的很流畅，使用上也很直接。我的标准OSINT环境在<a target="_blank" rel="noopener" href="https://linuxmint.com/">Linux Mint 19.1</a>上，并且运行 Cloudflair非常顺利。</p>
+<h4 id="Step-1"><a href="#Step-1" class="headerlink" title="Step 1"></a>Step 1</h4><p>在 <a target="_blank" rel="noopener" href="https://censys.io/">Censys.io</a>创建一个免费账户，你需要在账户页面获取API KEY与API SERCET以运行程序。</p>
+<h4 id="Step-2"><a href="#Step-2" class="headerlink" title="Step 2"></a>Step 2</h4><p>克隆<a target="_blank" rel="noopener" href="https://github.com/christophetd/CloudFlair">Cloudflair Github 存储库</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git clone https://github.com/christophetd/cloudflair.git</span><br></pre></td></tr></table></figure>
+
+<h4 id="Step-3"><a href="#Step-3" class="headerlink" title="Step 3"></a>Step 3</h4><p>安装Docker（如果没有安装的话）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt install docker.io</span><br></pre></td></tr></table></figure>
+
+<h4 id="Step-4"><a href="#Step-4" class="headerlink" title="Step 4"></a>Step 4</h4><p>如果这是第一次安装Docker，当尝试以非root用户身份运行命令时可能会遇到问题。确保所使用的帐户属于docker组。进行这些更改后，需要注销并重新登录。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo useradd -aG docker myusername</span><br></pre></td></tr></table></figure>
+
+<p>（在Mint&#x2F;Ubuntu系统中你需要切换到root用户执行命令。使用<code>sudo -i</code>命令切换，并在执行后切换回原用户）</p>
+<h4 id="Step-5"><a href="#Step-5" class="headerlink" title="Step 5"></a>Step 5</h4><p>运行以下命令，将目标域名添加到命令末尾。确保添加 Censys AAPI KEY与API SERCET以供其工作：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker run --rm -e CENSYS_API_ID=xxxxxxxxxxx -e CENSYS_API_SECRET=xxxxxxxxxxx christophetd/cloudflair evilwebsite.org</span><br></pre></td></tr></table></figure>
+
+<p>第一次运行此命令时，需要下载 Docker 映像。输出将如下所示（从作者的 GitHub 页面复制）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">[*] The target appears to be behind CloudFlare.</span><br><span class="line">[*] Looking for certificates matching &quot;myvulnerable.site&quot; using Censys</span><br><span class="line">[*] 75 certificates matching &quot;myvulnerable.site&quot; found.</span><br><span class="line">[*] Looking for IPv4 hosts presenting these certificates...</span><br><span class="line">[*] 10 IPv4 hosts presenting a certificate issued to &quot;myvulnerable.site&quot; were found.</span><br><span class="line">  - 51.194.77.1</span><br><span class="line">  - 223.172.21.75</span><br><span class="line">  - 18.136.111.24</span><br><span class="line">  - 127.200.220.231</span><br><span class="line">  - 177.67.208.72</span><br><span class="line">  - 137.67.239.174</span><br><span class="line">  - 182.102.141.194</span><br><span class="line">  - 8.154.231.164</span><br><span class="line">  - 37.184.84.44</span><br><span class="line">  - 78.25.205.83</span><br><span class="line"></span><br><span class="line">[*] Retrieving target homepage at https://myvulnerable.site</span><br><span class="line"></span><br><span class="line">[*] Testing candidate origin servers</span><br><span class="line">  - 51.194.77.1</span><br><span class="line">  - 223.172.21.75</span><br><span class="line">  - 18.136.111.24</span><br><span class="line">        responded with an unexpected HTTP status code 404</span><br><span class="line">  - 127.200.220.231</span><br><span class="line">        timed out after 3 seconds</span><br><span class="line">  - 177.67.208.72</span><br><span class="line">  - 137.67.239.174</span><br><span class="line">  - 182.102.141.194</span><br><span class="line">  - 8.154.231.164</span><br><span class="line">  - 37.184.84.44</span><br><span class="line">  - 78.25.205.83</span><br><span class="line"></span><br><span class="line">[*] Found 2 likely origin servers of myvulnerable.site!</span><br><span class="line">  - 177.67.208.72 (HTML content identical to myvulnerable.site)</span><br><span class="line">  - 182.102.141.194 (HTML content identical to myvulnerable.site)</span><br></pre></td></tr></table></figure>
+
+<p>现在你已经可以绕过Cloudflare，通过获取到的真实IP来进行你的探索！</p>
+<h4 id="Step-6"><a href="#Step-6" class="headerlink" title="Step 6"></a>Step 6</h4><p>为避免每次都输入冗长的 Docker 命令，请在 bashrc 文件中创建以下别名：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ nano ~/.bashrc</span><br></pre></td></tr></table></figure>
+
+<p>并在 .bashrc 中添加以下内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">alias cloudflair=&#x27;docker run --rm -e CENSYS_API_ID=xxxxxxxxxxx -e CENSYS_API_SECRET=xxxxxxxxxxx christophetd/cloudflair&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>保存并退出nano，退出并重启终端应用更改。</p>
+<p>现在你只需要输入：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$cloudflair mytargetwebsite.com</span><br></pre></td></tr></table></figure>
+
+<p>*除非另有说明，否则本文中的所有 IP 地址都是虚构的。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/OSINT/" rel="tag"># OSINT</a>
+              <a href="/tags/%E7%BF%BB%E8%AF%91/" rel="tag"># 翻译</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%E8%AF%91%EF%BC%9A%E4%BE%A6%E6%8E%A2%E6%8A%80%E5%B7%A7-%E5%AF%BB%E6%89%BE%E5%8E%86%E5%8F%B2WHOIS%E6%95%B0%E6%8D%AE/" rel="prev" title="译：侦探技巧-寻找历史WHOIS数据">
+      <i class="fa fa-chevron-left"></i> 译：侦探技巧-寻找历史WHOIS数据
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/QA-%E9%83%A8%E7%BD%B2HEXO/" rel="next" title="QA:部署HEXO">
+      QA:部署HEXO <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8Cloudflair"><span class="nav-number">1.</span> <span class="nav-text">使用Cloudflair</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%E5%B9%B6%E8%BF%90%E8%A1%8CCloudflair"><span class="nav-number">1.1.</span> <span class="nav-text">安装并运行Cloudflair</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-1"><span class="nav-number">1.1.1.</span> <span class="nav-text">Step 1</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-2"><span class="nav-number">1.1.2.</span> <span class="nav-text">Step 2</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-3"><span class="nav-number">1.1.3.</span> <span class="nav-text">Step 3</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-4"><span class="nav-number">1.1.4.</span> <span class="nav-text">Step 4</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-5"><span class="nav-number">1.1.5.</span> <span class="nav-text">Step 5</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-6"><span class="nav-number">1.1.6.</span> <span class="nav-text">Step 6</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Mrzhang76</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Mrzhang76</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

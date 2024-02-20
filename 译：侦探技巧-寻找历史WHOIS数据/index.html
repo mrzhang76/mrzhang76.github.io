@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"mrzhang76.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="原文地址：https:&#x2F;&#x2F;nixintel.info&#x2F;osint&#x2F;search-tip-finding-historic-whois-data&#x2F; 文章原名：Search Tip: Finding Historic WhoIs Data 作者： Nixintel  对于OSINT侦探来说，WHOIS简直是一座金矿。总是能在里面找到网站所有者或注册人的地址、电话号码、email等信息。然而，随着越来">
+<meta property="og:type" content="article">
+<meta property="og:title" content="译：侦探技巧-寻找历史WHOIS数据">
+<meta property="og:url" content="https://mrzhang76.github.io/%E8%AF%91%EF%BC%9A%E4%BE%A6%E6%8E%A2%E6%8A%80%E5%B7%A7-%E5%AF%BB%E6%89%BE%E5%8E%86%E5%8F%B2WHOIS%E6%95%B0%E6%8D%AE/">
+<meta property="og:site_name" content="七十六号工坊">
+<meta property="og:description" content="原文地址：https:&#x2F;&#x2F;nixintel.info&#x2F;osint&#x2F;search-tip-finding-historic-whois-data&#x2F; 文章原名：Search Tip: Finding Historic WhoIs Data 作者： Nixintel  对于OSINT侦探来说，WHOIS简直是一座金矿。总是能在里面找到网站所有者或注册人的地址、电话号码、email等信息。然而，随着越来">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202206020916663.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202206020916604.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202206020916553.png">
+<meta property="article:published_time" content="2022-06-01T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-19T11:05:42.952Z">
+<meta property="article:author" content="Mrzhang76">
+<meta property="article:tag" content="OSINT">
+<meta property="article:tag" content="翻译">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202206020916663.png">
+
+<link rel="canonical" href="https://mrzhang76.github.io/%E8%AF%91%EF%BC%9A%E4%BE%A6%E6%8E%A2%E6%8A%80%E5%B7%A7-%E5%AF%BB%E6%89%BE%E5%8E%86%E5%8F%B2WHOIS%E6%95%B0%E6%8D%AE/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-cn'
+  };
+</script>
+
+  <title>译：侦探技巧-寻找历史WHOIS数据 | 七十六号工坊</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">七十六号工坊</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-cn">
+    <link itemprop="mainEntityOfPage" href="https://mrzhang76.github.io/%E8%AF%91%EF%BC%9A%E4%BE%A6%E6%8E%A2%E6%8A%80%E5%B7%A7-%E5%AF%BB%E6%89%BE%E5%8E%86%E5%8F%B2WHOIS%E6%95%B0%E6%8D%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Mrzhang76">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="七十六号工坊">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          译：侦探技巧-寻找历史WHOIS数据
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2022-06-02 00:00:00" itemprop="dateCreated datePublished" datetime="2022-06-02T00:00:00+08:00">2022-06-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-02-19 19:05:42" itemprop="dateModified" datetime="2024-02-19T19:05:42+08:00">2024-02-19</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>原文地址：<a target="_blank" rel="noopener" href="https://nixintel.info/osint/search-tip-finding-historic-whois-data/">https://nixintel.info/osint/search-tip-finding-historic-whois-data/</a></p>
+<p>文章原名：Search Tip: Finding Historic WhoIs Data</p>
+<p>作者： Nixintel</p>
+</blockquote>
+<p>对于OSINT侦探来说，WHOIS简直是一座金矿。总是能在里面找到网站所有者或注册人的地址、电话号码、email等信息。然而，随着越来越多的域名注册商提供了隐私服务，以及GDPR（通用数据保护条例）的推广，大大降低了WHOIS服务作为OSINT工具的实用性。</p>
+<p>不过，可以利用 <a target="_blank" rel="noopener" href="https://archive.org/">Wayback Machine</a>的力量来查找在隐私保护和GDPR推广之前的历史WHOIS数据。将 <a target="_blank" rel="noopener" href="https://archive.org/">Wayback Machine</a>与Who.is获取到的信息相结合，以确定使用正确的URL来查找WHOIS历史记录。</p>
+<p>在此例中，我将查找最近破产的旅行社 <a target="_blank" rel="noopener" href="https://www.thomascook.com/">thomascook.com</a>的WHOIS信息。这是该域的当前WHOIS信息：</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202206020916663.png" alt="img"></p>
+<p>如果我们想使用WHOIS开始研究该公司，它并没有真正提供任何有用的信息。有个关于Comlaude的详细联系信息，这是一家为大型企业注册域名的服务商，但没有太多其他有用的信息供开源侦探所用。不要止步于此，Wayback Machine将帮助我们回溯时间到域名隐私保护被重视之前。</p>
+<p>从 who.is 查找 WHOIS 的 URL 始终采用以下格式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://who.is/whois/example.com</span><br></pre></td></tr></table></figure>
+
+<p>当在Wayback Machine 搜索存档页面时，URL始终采用以下格式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://web.archive.org/web/*/https://example.com</span><br></pre></td></tr></table></figure>
+
+<p>因此，将二者结合就可以得出用于搜索任何给定网站的WHOIS历史记录的URL格式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://web.archive.org/web/*/https://who.is/whois/example.com</span><br></pre></td></tr></table></figure>
+
+<p>所以，当我想搜索 <a target="_blank" rel="noopener" href="https://thomascook.com/">thomascook.com</a>的历史记录，将使用以下URL：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://web.archive.org/web/*/https://who.is/whois/thomascook.com</span><br></pre></td></tr></table></figure>
+
+<p>不出所料，它返回了GDPR前时代的结果：</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202206020916604.png" alt="img"></p>
+<p>这是在案的最早WHOIS记录：</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202206020916553.png" alt="img"></p>
+<p>使用这种技术可以发现一个真实的姓名、一个实际地址和一个常规的固定电话号码——所有这些都是进一步探索的绝佳起点。即使这个人的电子邮件地址是模糊的，但我们已经知道该域名，可以很容易地使用像 Hunter.io 这样的工具来猜测出他们最有可能的电子邮件地址是什么。这与我们仅依赖最新的注册商信息相比，从历史WHOIS得出的结果要好得多。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/OSINT/" rel="tag"># OSINT</a>
+              <a href="/tags/%E7%BF%BB%E8%AF%91/" rel="tag"># 翻译</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%E8%AF%91%EF%BC%9A%E6%97%A0WHOIS%E4%BF%A1%E6%81%AF%E7%9A%84%E7%BD%91%E7%AB%99%E6%89%80%E6%9C%89%E6%9D%83%E8%BF%BD%E8%B8%AA-%E9%80%9A%E8%BF%87%E5%8F%8D%E5%90%91IP%E6%9F%A5%E8%AF%A2/" rel="prev" title="译：无WHOIS信息的网站所有权追踪-通过反向IP查询">
+      <i class="fa fa-chevron-left"></i> 译：无WHOIS信息的网站所有权追踪-通过反向IP查询
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%E8%AF%91%EF%BC%9A%E7%BD%91%E7%AB%99%E8%BF%BD%E8%B8%AA-Cloudflare%E4%B8%8ECloudflair%E7%9A%84%E5%AF%B9%E6%8A%97/" rel="next" title="译：网站追踪-Cloudflare与Cloudflair的对抗">
+      译：网站追踪-Cloudflare与Cloudflair的对抗 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Mrzhang76</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Mrzhang76</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

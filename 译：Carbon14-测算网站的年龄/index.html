@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"mrzhang76.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="原文地址：https:&#x2F;&#x2F;nixintel.info&#x2F;osint-tools&#x2F;carbon-14-verifying-the-age-of-a-website&#x2F; 文章原名：Carbon-14: Verifying The Age of A Website 作者： Nixintel  Carbon14(碳十四)是一款用于网站调查和核查的有力Python工具。它让调查员可以确定网页的创建时间以及该页">
+<meta property="og:type" content="article">
+<meta property="og:title" content="译：Carbon14-测算网站的年龄">
+<meta property="og:url" content="https://mrzhang76.github.io/%E8%AF%91%EF%BC%9ACarbon14-%E6%B5%8B%E7%AE%97%E7%BD%91%E7%AB%99%E7%9A%84%E5%B9%B4%E9%BE%84/">
+<meta property="og:site_name" content="七十六号工坊">
+<meta property="og:description" content="原文地址：https:&#x2F;&#x2F;nixintel.info&#x2F;osint-tools&#x2F;carbon-14-verifying-the-age-of-a-website&#x2F; 文章原名：Carbon-14: Verifying The Age of A Website 作者： Nixintel  Carbon14(碳十四)是一款用于网站调查和核查的有力Python工具。它让调查员可以确定网页的创建时间以及该页">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251906227.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251906024.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251921746.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251932959.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251933429.png">
+<meta property="article:published_time" content="2022-05-24T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-19T11:04:13.165Z">
+<meta property="article:author" content="Mrzhang76">
+<meta property="article:tag" content="OSINT">
+<meta property="article:tag" content="翻译">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251906227.png">
+
+<link rel="canonical" href="https://mrzhang76.github.io/%E8%AF%91%EF%BC%9ACarbon14-%E6%B5%8B%E7%AE%97%E7%BD%91%E7%AB%99%E7%9A%84%E5%B9%B4%E9%BE%84/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-cn'
+  };
+</script>
+
+  <title>译：Carbon14-测算网站的年龄 | 七十六号工坊</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">七十六号工坊</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-cn">
+    <link itemprop="mainEntityOfPage" href="https://mrzhang76.github.io/%E8%AF%91%EF%BC%9ACarbon14-%E6%B5%8B%E7%AE%97%E7%BD%91%E7%AB%99%E7%9A%84%E5%B9%B4%E9%BE%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Mrzhang76">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="七十六号工坊">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          译：Carbon14-测算网站的年龄
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2022-05-25 00:00:00" itemprop="dateCreated datePublished" datetime="2022-05-25T00:00:00+08:00">2022-05-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-02-19 19:04:13" itemprop="dateModified" datetime="2024-02-19T19:04:13+08:00">2024-02-19</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>原文地址：<a target="_blank" rel="noopener" href="https://nixintel.info/osint-tools/carbon-14-verifying-the-age-of-a-website/">https://nixintel.info/osint-tools/carbon-14-verifying-the-age-of-a-website/</a></p>
+<p>文章原名：Carbon-14: Verifying The Age of A Website</p>
+<p>作者： Nixintel</p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="https://github.com/Lazza/Carbon14">Carbon14</a>(碳十四)是一款用于网站调查和核查的有力Python工具。它让调查员可以确定网页的创建时间以及该页面在首次上传后是否进行了修改。Carbon14会检查网页中图像所包含的数据，以判断它们何时上传与发布。这将有助于确定网页首次创建的可能时间段，或确定网站自创建之后调整或更改的频率。这对于需要进行大量验证工作的OSINT调查员极为有用。</p>
+<p>Carbon14将检查图片发布时生成的<code>Last-Modified</code> HTTP参数。这意味着它能确定网页内容的首次创建时间。注意，它检测的是图片发布在网站上的时间，而不是图片实际拍摄的日期，这种检测并不依赖于EXIF数据。</p>
+<h2 id="开始使用"><a href="#开始使用" class="headerlink" title="开始使用"></a>开始使用</h2><p>Carbon14可以运行在Windows，Mac与Linux操作系统上，并需要Python 2.7运行环境。如果你没有在Windows系统上安装Python2.7，可以参考<a target="_blank" rel="noopener" href="https://www.codeooze.com/coding/python-2715-windows-install/">相关指南</a>。在Mac OS与Linux系统上，Python2.7已被预装。</p>
+<p>使用命令行从Github下载或克隆Carbon14库</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git clone https://github.com/Lazza/Carbon14</span><br></pre></td></tr></table></figure>
+
+<p>如果你不习惯使用命令行进行Github库的克隆，参考<a target="_blank" rel="noopener" href="https://help.github.com/en/articles/cloning-a-repository">相关指南</a>将存储库作为ZIP文件下载并手动解压。</p>
+<p>一旦下载完成，将工作目录切换到新创建的Carbon14目录</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ cd Carbon14</span><br></pre></td></tr></table></figure>
+
+<p>现在安装额外的软件运行依赖。你可能需要在管理员(root)权限下安装一些软件插件，在这种情况下，在命令前添加<code>sudo</code>(Mac与Linux)。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ python2.7 -m pip install -r requirements.txt</span><br></pre></td></tr></table></figure>
+
+<p>当依赖安装完成时，你可以通过以下命令来调出Carbon14的帮助菜单（这个菜单很短）。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ python2.7 carbon14.py -h</span><br></pre></td></tr></table></figure>
+
+<p>在这里指定了 Python 2.7，因为我系统上的默认 Python 版本高于 2.7，并且无法正确运行 Carbon14。</p>
+<p>使用如下命令检查网页的年龄：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ python2.7 carbon14.py https://examplewebsite.com</span><br></pre></td></tr></table></figure>
+
+<p>可以选择将你的姓名添加到 Carbon14 使用 <code>-a</code> 生成的简短报告的标题中，如下所示：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ python2.7 -a NixIntel carbon14.py https://examplewebsite.com</span><br></pre></td></tr></table></figure>
+
+<h2 id="示例-检查页面的变更"><a href="#示例-检查页面的变更" class="headerlink" title="示例-检查页面的变更"></a>示例-检查页面的变更</h2><p>我将以我最近写的<a target="_blank" rel="noopener" href="https://nixintel.info/osint/digital-shadows-seeking-sector035-quiztime-26th-september-2019/">文章</a>作为示例，看看Carbon14能做些什么。发布日期显示它在2019年10月5日被发布，但据我所知，在最终版本发布之前，我曾上传了一些草稿并编辑了许多照片。Carbon14能检测到这些变化并指出我何时进行了这些操作吗？</p>
+<p>检测博客文章的命令如下所示：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ python2.7 carbon14.py https://nixintel.info/osint/digital-shadows-seeking-sector035-quiztime-26th-september-2019/</span><br></pre></td></tr></table></figure>
+
+<p>结果如下图所示。Carbon14 抓取了我插入在文章中的所有图片的URL与最初上传时的时间和日期。你能通过查看图片的发布日期来发现我何时进行了编辑吗？</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251906227.png" alt="img"></p>
+<p>根据这些信息，可以确定我是在伦敦时间2019年 10月5日大约19:34到21:32之间撰写这篇文章的。Carbon14按时间顺序显示结果，这意味着可以计算出我何时对文章进行了编辑并添加了新的图片。</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251906024.png" alt="img"></p>
+<p>虽然博客显示的发布时间为10月5日，但Carbon14发现了我在2019年10月6日09:51对文章进行了编辑，添加了更多的图片。直接查看网页并不会发现这种情况，但我的所作所为通过图像发布的时间戳暴漏了。这种技术适用于各种网页，显然你可以使用它来确定作者何时添加或替换文章图片，以及该文章最有可能的首次发布时间。<a target="_blank" rel="noopener" href="https://archive.org/">网站图书馆</a>通常也不会检测这类更改，因此这种方法将有效且精确的了解在过去的一段时间内网站所发生的变化。</p>
+<h2 id="Carbon14与推特"><a href="#Carbon14与推特" class="headerlink" title="Carbon14与推特"></a>Carbon14与推特</h2><p>Carbon14对推特有用吗？推特并不允许已发布的内容被修改，所以Carbon14并不能显示任何更改发生的时间。然而，基于其检测网页的方式，它仍能返回一些有用的图片信息。就在我写这篇文章的时候，我注意到<a target="_blank" rel="noopener" href="https://twitter.com/mahrko/">Marko Bereth</a>有一篇新的 Quiztime帖子，所以我打算测试一下。</p>
+<p>他发布在推特上的原始图片URL为：</p>
+<p><a target="_blank" rel="noopener" href="https://twitter.com/mahrko/status/1185220029224280065/photo/1">https://twitter.com/mahrko/status/1185220029224280065/photo/1</a></p>
+<p>使用Carbon14对其进行检测：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ python2.7 carbon14.py https://twitter.com/mahrko/status/1185220029224280065/photo/1</span><br></pre></td></tr></table></figure>
+
+<p>它返回了几个有趣的结果：</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251921746.png" alt="img"></p>
+<p>这一结果不仅显示了在推文中图像的URL，还显示了图像的增强更高分辨率版本的URL（由large后缀表示）。</p>
+<p>它还返回了Marco个人资料图片的三个URL，最大尺寸为400×400像素。</p>
+<p>我们可以发现，Marco在2019年9月22日14:12:33 UTC发布了他最新的个人资料图片。显示，通过这种方式获取推特个人资料图片的发布时间将有助于了解该账户是否处于活跃状态或账户创建后有无进行个人资料图片的更改。</p>
+<h2 id="Instagram"><a href="#Instagram" class="headerlink" title="Instagram"></a>Instagram</h2><p>我也注意到，Carbon14可以自动地从Instagram获取高分辨率图像并精确的展示图像的发布时间。比如巴西足球传奇人物 <a target="_blank" rel="noopener" href="https://www.instagram.com/ronaldo/">Ronaldo</a>的最新发布：</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251932959.png" alt="img"></p>
+<p>使用Carbon14检查帖子的URL将返回一个简短结果：</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251933429.png" alt="img"></p>
+<p>这将告诉我们图片被发布Instagram在上的精确时间（13年10月19日16:24:39 UTC），这可比Instagram显示在页面上的5天前不知道高到哪里去了。它还提供了比浏览器中显示的图像更高分辨率版本的URL （从技术上讲，它是相同的图像，只是呈现方式不同）。你也可以通过开发者控制台进行完整图像URL的挖掘来获取这些信息，但Carbon14更加的方便。</p>
+<p>Happy Carbon dating!</p>
+<p>考古快乐！</p>
+<blockquote>
+<p>译者注：</p>
+<p>该篇为《How To Find Timestamps For Verification》所提到的进行图片时间戳提取的文章。</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/OSINT/" rel="tag"># OSINT</a>
+              <a href="/tags/%E7%BF%BB%E8%AF%91/" rel="tag"># 翻译</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%E8%AF%91%EF%BC%9A%E5%A6%82%E4%BD%95%E5%AF%BB%E6%89%BE%E7%94%A8%E4%BA%8E%E9%AA%8C%E8%AF%81%E7%9A%84%E6%97%B6%E9%97%B4%E6%88%B3/" rel="prev" title="译：如何寻找用于验证的时间戳">
+      <i class="fa fa-chevron-left"></i> 译：如何寻找用于验证的时间戳
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%E8%AF%91%EF%BC%9A%E7%BD%91%E7%AB%99OSINT-Antifa-com%E4%B8%8ER%E5%9B%BD%E7%9B%B8%E5%85%B3%E5%90%97%EF%BC%9F/" rel="next" title="译：网站OSINT-Antifa.com与R国相关吗？">
+      译：网站OSINT-Antifa.com与R国相关吗？ <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E5%A7%8B%E4%BD%BF%E7%94%A8"><span class="nav-number">1.</span> <span class="nav-text">开始使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B-%E6%A3%80%E6%9F%A5%E9%A1%B5%E9%9D%A2%E7%9A%84%E5%8F%98%E6%9B%B4"><span class="nav-number">2.</span> <span class="nav-text">示例-检查页面的变更</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Carbon14%E4%B8%8E%E6%8E%A8%E7%89%B9"><span class="nav-number">3.</span> <span class="nav-text">Carbon14与推特</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Instagram"><span class="nav-number">4.</span> <span class="nav-text">Instagram</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Mrzhang76</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Mrzhang76</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

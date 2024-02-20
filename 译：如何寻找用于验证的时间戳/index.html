@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"mrzhang76.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="原文地址：https:&#x2F;&#x2F;nixintel.info&#x2F;osint&#x2F;how-to-find-timestamps-for-verification&#x2F; 文章原名：How To Find Timestamps For Verification 作者： Nixintel  对于网络侦探(internet investigator)来说，能准确证明数据是什么时候发布在互联网上属于一种核心技能。如果你想能证">
+<meta property="og:type" content="article">
+<meta property="og:title" content="译：如何寻找用于验证的时间戳">
+<meta property="og:url" content="https://mrzhang76.github.io/%E8%AF%91%EF%BC%9A%E5%A6%82%E4%BD%95%E5%AF%BB%E6%89%BE%E7%94%A8%E4%BA%8E%E9%AA%8C%E8%AF%81%E7%9A%84%E6%97%B6%E9%97%B4%E6%88%B3/">
+<meta property="og:site_name" content="七十六号工坊">
+<meta property="og:description" content="原文地址：https:&#x2F;&#x2F;nixintel.info&#x2F;osint&#x2F;how-to-find-timestamps-for-verification&#x2F; 文章原名：How To Find Timestamps For Verification 作者： Nixintel  对于网络侦探(internet investigator)来说，能准确证明数据是什么时候发布在互联网上属于一种核心技能。如果你想能证">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/image-15.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/image.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251747082.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251747481.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251747625.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251748827.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251748788.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251748264.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251748711.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251748361.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251748580.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251748969.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251748235.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251748627.png">
+<meta property="article:published_time" content="2022-05-23T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-19T11:05:36.213Z">
+<meta property="article:author" content="Mrzhang76">
+<meta property="article:tag" content="OSINT">
+<meta property="article:tag" content="翻译">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/image-15.png">
+
+<link rel="canonical" href="https://mrzhang76.github.io/%E8%AF%91%EF%BC%9A%E5%A6%82%E4%BD%95%E5%AF%BB%E6%89%BE%E7%94%A8%E4%BA%8E%E9%AA%8C%E8%AF%81%E7%9A%84%E6%97%B6%E9%97%B4%E6%88%B3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-cn'
+  };
+</script>
+
+  <title>译：如何寻找用于验证的时间戳 | 七十六号工坊</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">七十六号工坊</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-cn">
+    <link itemprop="mainEntityOfPage" href="https://mrzhang76.github.io/%E8%AF%91%EF%BC%9A%E5%A6%82%E4%BD%95%E5%AF%BB%E6%89%BE%E7%94%A8%E4%BA%8E%E9%AA%8C%E8%AF%81%E7%9A%84%E6%97%B6%E9%97%B4%E6%88%B3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Mrzhang76">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="七十六号工坊">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          译：如何寻找用于验证的时间戳
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2022-05-24 00:00:00" itemprop="dateCreated datePublished" datetime="2022-05-24T00:00:00+08:00">2022-05-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-02-19 19:05:36" itemprop="dateModified" datetime="2024-02-19T19:05:36+08:00">2024-02-19</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>原文地址：<a target="_blank" rel="noopener" href="https://nixintel.info/osint/how-to-find-timestamps-for-verification/">https://nixintel.info/osint/how-to-find-timestamps-for-verification/</a></p>
+<p>文章原名：How To Find Timestamps For Verification</p>
+<p>作者： Nixintel</p>
+</blockquote>
+<p>对于网络侦探(internet investigator)来说，能准确证明数据是什么时候发布在互联网上属于一种核心技能。如果你想能证实某个视频何时第一次上传，某个账户何时创建，或者是某个网站何时进行了编辑更改，那你就需要尽可能的精确确定时间。</p>
+<p>这似乎很简单，因为当一篇文章被发布时或一张照片被上传时，发布时间和日期将被展示在网站页面上，但是这种可见的时间信息通常达不到详细分析或验证工作所需的精度。幸好网页源代码中通常隐藏着额外的时间戳数据，它们并不直接显示在浏览器中。通过获取这些隐藏的信息来创建非常精确的时间表，准确的证明或反驳某些事情发生的时间，这将显著的提升调查的准确度。</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/image-15.png"></p>
+<p>每个平台都采取独有的方式进行时间信息的存储。这意味着要经过一些试错才能发现不同平台的时间存储方式，但大体上有两种方法进行这些数据的获取。一种是查找嵌入在网页源代码中的信息，另一种是查找网站数据库向浏览器发送的JSON内容中的信息。第一种方式比第二种稍微简单一些，所以让我们从一个查找youtube直播的详细时间戳为例进行说明。</p>
+<h2 id="YouTube-直播时间信息"><a href="#YouTube-直播时间信息" class="headerlink" title="YouTube 直播时间信息"></a>YouTube 直播时间信息</h2><p>YouTube可以很好的展示浏览器中展示的少量时间信息与隐藏在网页源代码中的详细时间信息的差异。</p>
+<p>这有一场我们在上周也就是2022年1月27日的直播：<a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=OEhD_DM0NXs">OSINT Curious livestream video</a> 。视频下方展示了首次直播的状态信息。</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/image.png"></p>
+<p>但我们并不能知道直播是在那天的什么时候开始的。YouTube只为我们提供了日期，没有准确的时间，所以我们需要通过挖掘页面源代码来寻找更多明确的信息。</p>
+<p>想要查看页面源代码，你需要右键单击浏览器，然后单击“查看源代码”或“查看页面源代码”。你会看到这样的东西：</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251747082.png"></p>
+<p>它们是你从Youtube获取到的原始HTML和javascript，浏览器会将它们翻译成你所看到的页面。你的浏览器并不是将获取到的所有数据呈现在页面上，这些未使用的数据我们依旧可以访问。通过快捷键<strong>Ctrl+F</strong> 调出搜索栏，搜索类似“<strong>uploaded</strong> ,<strong>time</strong>, <strong>date</strong>, <strong>published</strong>, <strong>created</strong>” 等关键字通常可以找到额外的时间相关信息。</p>
+<p>果然，通过搜索”<strong>published</strong>“我们发现了一些有用的信息。</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251747481.png"></p>
+<p>我对代码进行了美化以方便阅读：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;meta itemprop=&quot;interactionCount&quot; content=&quot;441&quot;&gt;</span><br><span class="line">&lt;meta itemprop=&quot;datePublished&quot; content=&quot;2022-01-28&quot;&gt;</span><br><span class="line">&lt;meta itemprop=&quot;uploadDate&quot; content=&quot;2022-01-28&quot;&gt;</span><br><span class="line">&lt;meta itemprop=&quot;genre&quot; content=&quot;Entertainment&quot;&gt;</span><br><span class="line">&lt;span itemprop=&quot;publication&quot; itemscope itemtype=&quot;http://schema.org/BroadcastEvent&quot;&gt;&lt;meta itemprop=&quot;isLiveBroadcast&quot; content=&quot;True&quot;&gt;</span><br><span class="line">&lt;meta itemprop=&quot;startDate&quot; content=&quot;2022-01-27T19:59:36+00:00&quot;&gt;</span><br><span class="line">&lt;meta itemprop=&quot;endDate&quot; content=&quot;2022-01-27T20:35:05+00:00&quot;&gt;</span><br><span class="line">&lt;/span&gt;&lt;/div&gt;</span><br></pre></td></tr></table></figure>
+
+<p>标签<code>meta itemprop</code>中包含了比之前我们看到的更加精确的时间信息。<code>startDate</code>标签说明了直播在1月27日19:59:36（UTC时间）开始，<code>endDate</code>标签说明了直播在当天20:35:05结束。注意，标签<code>uploadDate</code>说明了并不是在直播结束立刻进行了上传，这可能是由于一些延迟造成的。但仍然能从给出的开始与结束时间精确的确定直播时段。</p>
+<p>如果你想知道这种技巧在现实世界调查中的使用，你可以看看Brecht Castel是如何<a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=lDsOqgmBvMk">通过直播的时间信息</a>去确定近期一次street demonstration的时间线。</p>
+<h2 id="推特账户创建时间信息"><a href="#推特账户创建时间信息" class="headerlink" title="推特账户创建时间信息"></a>推特账户创建时间信息</h2><p>挖掘时间戳数据的第二种技巧涉及到对网站数据库所传递的信息进行捕获。当你通过你的浏览器访问网站时，你将向网站服务器发送请求以获取存储在站点数据库内的数据。服务器将响应你的请求，返回数据库中匹配的信息。通常情况下，数据库以JSON格式传递数据，浏览器将响应的JSON数据渲染成你所见的的网页。</p>
+<p>通过使用浏览器的<a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=r9bMGKET8xg">开发者模式</a>，就能看到所有这些请求和响应的内容。这通常包含了很多在页面源代码中并不总是可用的有趣额外信息。让我们看看这些内容在推特账户创建时间戳上是怎样的。</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251747625.png"></p>
+<p>The OSINT Curious Project的推特账户是什么时候创建的？ 很明显答案是2018年12月，就在个人资料页上。对于一般推特用户来说，这就足够了。但如果你正在调查一个魔怔人账户，或者是一系列由外国政府所设立用于传播虚假信息的账户，这样的信息并不精确。</p>
+<p>当你只有按年、月记的账户创建时间时，你很难精确的说明一个账户何时创建，或者证明一系列可疑的账户恰好在同一时间内创建。</p>
+<p>通过检索网站的请求与响应信息，我们可以找到许多关于账户何时创建的特殊信息。首先按F12进入浏览器的开发者模式。在这里我使用了Firefox，不过在Chrome上的操作流程是一样的。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. 按下**Ctrl + R**重载页面</span><br><span class="line">2. 点击**Network** 选项卡，你就能看到：</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251748827.png"></p>
+<p>这里你可以看到你的浏览器与推特服务器之间所有的请求与响应。这里有非常多的信息，人工筛选比较困难。幸好我们可以像之前在处理Youtube页面源代码时一样，通过像<strong>time</strong>, <strong>posted</strong>, <strong>published</strong>, <strong>created</strong>这类关键字进行过滤。点击放大镜图标（在“initiator”列的正上方）将调出搜索栏，输入关键字进行搜索。</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251748788.png"></p>
+<p>并不是所有信息都是相关的，但在”twitter.com”下找到的条目都指向来自推特的JSON数据，这其中包含的有关推特账户个人资料的信息可比在网页中可见的信息多得多。注意，因为推特在同一页面上展示了很多其他人的个人资料（“你可能喜欢…”），你将获得不止一个账户的信息。</p>
+<p>点击其中一条结果将打开如下所示的用于显示响应的面板。取消”raw”选项来让原始数据以可读格式显示，就像下图所示：</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251748264.png" alt="img"></p>
+<p><code>created_at </code>字段显示了账户创建时的完整时间戳。我们之前仅知道该账户在2018年12月创建，但现在能准确的知道精确到秒的创建时间，这对调查来说非常有用。</p>
+<h2 id="Instagram-帖子和评论的时间信息"><a href="#Instagram-帖子和评论的时间信息" class="headerlink" title="Instagram 帖子和评论的时间信息"></a>Instagram 帖子和评论的时间信息</h2><p>一旦你熟悉了如何在网页源代码或服务器响应中进行检索，那么想获取其他类型的数据也很容易。Instagram是出了名的难搞，但还是能找到一些有用的数据片段。调查员在Instagram上遇到的第一个挑战就是随着时间而变得模糊的时间戳信息。最近的帖子时间显示的很具体（例如“9小时前”）,但随着时间的推移，帖子发布的时间将仅显示日期而没有具体时间，评论的时间戳信息仅以周为单位。对于Instagram用户来说当然不成问题，但对于想要精确的复现事件何时发生的调查员来说，问题很大。</p>
+<p>所幸，Instagram的服务器响应中也隐藏了一些有趣的信息供我们所用。让我们看看能从<a target="_blank" rel="noopener" href="https://www.instagram.com/therock/">Rock</a>的账户中找出什么吧。</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251748711.png" alt="img"></p>
+<p>在我写这篇文章时（2022年2月6日 星期日），Rock最近发布的文章展示了他在健身房锻炼。我可以看到它是在9小时前发布的。</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251748361.png" alt="img"></p>
+<p>现在看起来没什么问题，但如果我想对数月甚至数年前发布的内容分析时会发生什么？这篇<a target="_blank" rel="noopener" href="https://www.instagram.com/p/6kvP6Hoh5q/">2015年发布的内容</a>展示了信息是如何随着时间推移变得模糊的。虽然它仍有时间戳（2015年8月19日），但只有日期没有具体时间。评论的信息更加模糊，它们甚至只显示了在多少周之前发布的，这种信息的用处不大，没法获得具体的发布时间。</p>
+<p>不过一定会有一些有用的数据。除非它有额外的时间戳信息可供参考，不然Instagram 怎么能告诉我评论是在 216 周前发表的。如果我们能找到这些额外信息，我们应该能够获取到更准确的时间戳数据。</p>
+<p>为了查找特定 Instagram 帖子的时间戳信息，要像 上面的Twitter 示例一样在开发人员模式下打开页面。通过搜索<code>PostPage</code>条目将找到一些有用的JSON数据，包含了有关发布内容的额外信息，其中还有时间戳数据。可能会找到很多与<code>PostPage</code>相匹配的信息，你所需要的信息将列在正在研究的贴子的主URL下。当URL是<a target="_blank" rel="noopener" href="https://www.instagram.com/p/6kvP6Hoh5q/">https://www.instagram.com/p/6kvP6Hoh5q/</a> 时，下图就是相关信息所在的位置。根据检索的结果可知，“<code>PostPage</code>”信息可以在响应内容的第 21、28、266、269 和 276 行找到</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251748580.png" alt="img"></p>
+<p>在第266行可以找到：</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251748969.png" alt="img"></p>
+<p><code>taken_at</code>条目存储了UNIX格式的时间戳。使用<a target="_blank" rel="noopener" href="https://www.unixtimestamp.com/index.php">UNIX timestamp convertor</a>我们可知1440006804即为2015年8月19日星期三 17:53:44。这可比单纯的日期精确多了。</p>
+<p>你可能已经注意到了还有一个被叫做<code>device_timestamp</code>的UNIX时间戳。在本例中，它记录的时间是同一天的17:37:30，大约比<code>taken_at</code>字段存储的时间早了16分钟，这是怎么回事？在对此的研究中，我注意到<code>device_timestamp</code>字段记录的时间总是在<code>taken_at</code>字段之前。目前对此我最好的解释是<code>device_timestamp</code>基于图像或视频在设备上实际创建的时间，而<code>taken_at</code>字段反映了实际的上传时间。我需要做一些额外的研究来验证我的假设，但目前来说这是个合理的推断。</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251748235.png" alt="img"></p>
+<p>获取评论时间戳信息的流程也是相同的。Instagram 显示 mrdannybee 对 Rock 帖子的评论是在 216 周前发布的，但在回复中搜索“mrdannybee”会找到与他评论相关的 JSON数据，其中包含更具体的时间戳：</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202205251748627.png" alt="img"></p>
+<p>果然 1513315605 指的是 2017 年 12 月 15 日星期五 05:26:45 UTC，也就是 在216 周前。可以使用<a target="_blank" rel="noopener" href="https://datetimego.com/">DateTimeGo</a> 进行核查，它将为你计算出 x 周或数月前的实际日期。</p>
+<p>本文只是对从网站内容中检索更详细的信息的几种技术的简要概述，但一旦你学会了如何通过这种方式寻找额外的数据，它就为寻找有用的数据提供了更多的机会。</p>
+<p>如果你觉得这篇指南很有用，那你还可能很喜欢我之前关于从网站上发布的图片中提取时间戳（<a target="_blank" rel="noopener" href="https://nixintel.info/osint-tools/carbon-14-verifying-the-age-of-a-website/">extracting timestamps from images posted on websites</a>）的文章。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/OSINT/" rel="tag"># OSINT</a>
+              <a href="/tags/%E7%BF%BB%E8%AF%91/" rel="tag"># 翻译</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/%E8%AF%91%EF%BC%9ACarbon14-%E6%B5%8B%E7%AE%97%E7%BD%91%E7%AB%99%E7%9A%84%E5%B9%B4%E9%BE%84/" rel="next" title="译：Carbon14-测算网站的年龄">
+      译：Carbon14-测算网站的年龄 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#YouTube-%E7%9B%B4%E6%92%AD%E6%97%B6%E9%97%B4%E4%BF%A1%E6%81%AF"><span class="nav-number">1.</span> <span class="nav-text">YouTube 直播时间信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%A8%E7%89%B9%E8%B4%A6%E6%88%B7%E5%88%9B%E5%BB%BA%E6%97%B6%E9%97%B4%E4%BF%A1%E6%81%AF"><span class="nav-number">2.</span> <span class="nav-text">推特账户创建时间信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Instagram-%E5%B8%96%E5%AD%90%E5%92%8C%E8%AF%84%E8%AE%BA%E7%9A%84%E6%97%B6%E9%97%B4%E4%BF%A1%E6%81%AF"><span class="nav-number">3.</span> <span class="nav-text">Instagram 帖子和评论的时间信息</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Mrzhang76</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Mrzhang76</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
