@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"mrzhang76.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="原文地址：https:&#x2F;&#x2F;nixintel.info&#x2F;osint&#x2F;geolocating-mobile-phones-with-an-ip&#x2F; 文章原名：Geolocating Mobile Phones With An IP 作者： Nixintel 原文发布时间：2020-07-05  } 本文与 *Matthias Wilson (@MWOSINT)*共同撰写，其个人网站也进行了发布。 IP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="译：通过IP地址定位手机">
+<meta property="og:url" content="https://mrzhang76.github.io/%E8%AF%91%EF%BC%9A%E9%80%9A%E8%BF%87IP%E5%9C%B0%E5%9D%80%E5%AE%9A%E4%BD%8D%E6%89%8B%E6%9C%BA/">
+<meta property="og:site_name" content="七十六号工坊">
+<meta property="og:description" content="原文地址：https:&#x2F;&#x2F;nixintel.info&#x2F;osint&#x2F;geolocating-mobile-phones-with-an-ip&#x2F; 文章原名：Geolocating Mobile Phones With An IP 作者： Nixintel 原文发布时间：2020-07-05  } 本文与 *Matthias Wilson (@MWOSINT)*共同撰写，其个人网站也进行了发布。 IP">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202402251139356.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202402251435685.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202402251438090.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202402251625939.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202402251627600.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202402252119381.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202402252123248.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202402252124491.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202402252127881.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202402252148050.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202402252150014.png">
+<meta property="article:published_time" content="2024-02-20T07:29:39.000Z">
+<meta property="article:modified_time" content="2024-02-24T10:02:16.867Z">
+<meta property="article:author" content="Mrzhang76">
+<meta property="article:tag" content="OSINT">
+<meta property="article:tag" content="翻译">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202402251139356.png">
+
+<link rel="canonical" href="https://mrzhang76.github.io/%E8%AF%91%EF%BC%9A%E9%80%9A%E8%BF%87IP%E5%9C%B0%E5%9D%80%E5%AE%9A%E4%BD%8D%E6%89%8B%E6%9C%BA/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-cn'
+  };
+</script>
+
+  <title>译：通过IP地址定位手机 | 七十六号工坊</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">七十六号工坊</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-cn">
+    <link itemprop="mainEntityOfPage" href="https://mrzhang76.github.io/%E8%AF%91%EF%BC%9A%E9%80%9A%E8%BF%87IP%E5%9C%B0%E5%9D%80%E5%AE%9A%E4%BD%8D%E6%89%8B%E6%9C%BA/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Mrzhang76">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="七十六号工坊">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          译：通过IP地址定位手机
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-02-20 15:29:39" itemprop="dateCreated datePublished" datetime="2024-02-20T15:29:39+08:00">2024-02-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-02-24 18:02:16" itemprop="dateModified" datetime="2024-02-24T18:02:16+08:00">2024-02-24</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>原文地址：<a target="_blank" rel="noopener" href="https://nixintel.info/osint/geolocating-mobile-phones-with-an-ip/">https://nixintel.info/osint/geolocating-mobile-phones-with-an-ip/</a></p>
+<p>文章原名：Geolocating Mobile Phones With An IP</p>
+<p>作者： Nixintel</p>
+<p>原文发布时间：2020-07-05</p>
+</blockquote>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202402251139356.png">}</p>
+<p>本文与 *Matthias Wilson (<a target="_blank" rel="noopener" href="https://twitter.com/mwosint">@MWOSINT</a>)*共同撰写，其<a target="_blank" rel="noopener" href="https://keyfindings.blog/2020/07/05/geolocating-mobiles-phones-based-on-ips/">个人网站</a>也进行了发布。</p>
+<p>IP地址在数字取证方面占据着重要地位，但对地理定位有多大用处？事实上，尽管IP地址在侦查方面有许多用处，但在作为定位手段上来说是不可靠的。</p>
+<p>IP地址技术本身限制了其成为定位工具。当前的IPv4协议仅允许存在43亿个不同的IP地址，这在设计它的1980年代并不算得上问题，但如今所需的IP地址远超协议所能提供的。</p>
+<p>为了解决IP地址短缺问题，ISP在过去的几十年里开发了多种方案。例如，反向代理服务器可以让上千台服务器使用相同的静态IP地址。</p>
+<p>网站和服务使用的IP地址通常是固定的。但如果你从家用网络访问这篇文章，你很有可能被你的ISP分配了动态IP。这一IP地址可能在几小时或几天内不变，但ISP商们会经常根据需要调整并重分配IP地址。今天你所拥有的IP地址可能明天就属于这个国家其他地方的人。</p>
+<p>在移动互联网方面来说，IP地址短缺问题甚至更加严重。无论你何时连接到3G或4G网络，就可能与几千名其他用户在同一时间分享IP地址。在蜂窝网络中，IP地址也改变的极其迅速，有时甚至几秒一次。</p>
+<p>在地理位置与蜂窝网络IP地址之间并不存在真正的相关性。其组织方式并不像老式固定电话一样，而是更取决于ISP的分组方式与服务类型。</p>
+<p>有关这一方面的更多细节推荐阅读这两篇论文：</p>
+<p><a target="_blank" rel="noopener" href="http://www.cs.yale.edu/homes/mahesh/papers/ephemera-imc09.pdf">Where’s that Phone?: Geolocating IP Addresses on 3G Networks</a></p>
+<p><a target="_blank" rel="noopener" href="https://link.springer.com/chapter/10.1007/978-3-642-28537-0_16">Geolocating IP Addresses in Cellular Data Networks | SpringerLink</a></p>
+<p>那对于像 <a target="_blank" rel="noopener" href="https://www.maxmind.com/en/home">Maxmind</a> 这样的IP地址定位服务如何评价？稍微研究一下它们所提供的数据准确性报告可知，对于其提供的地理信息要谨慎对待。</p>
+<p>以德国为例，Maxmind声称其百分之八十三的IP地址与真实地址真正相关，但这是在五十公里半径内，并仅指固定宽带线路。</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202402251435685.png"></p>
+<p>而对于蜂窝网络IP，其准确性骤降，在五十公里半径中仅有百分之三十八</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202402251438090.png"></p>
+<p>位置越具体，置信度越低。在德国，IP地址与特定城市关联的置信度仅为百分之十六。而在美国，这一数据为百分之十二，有百分之七十三的IP地址被认为解析不正确。如果说即使是世界领先的IP地址定位公司对于50公里半径定位的精确度也只有如此低的信心，更别说对于具体的城市，那么您还相信蜂窝网络IP定位的准确性吗？</p>
+<p>这并不是IP地址定位商的过错，它仅仅是反映了ISP商们按照网络需求而不是地理位置分配IP的现实。</p>
+<p>然而，众所周知，可以对手机进行定位。当手机连接到信号塔时，实际上也同时连接到周围所有的信号塔（至少可以监控信号强度）。每个信号塔都存在唯一ID，这一ID可以通过很多方式获取，例如拦截手机与信号塔之间的无线连接，或通过网络反向链接获取连接信息。如果知晓了信号塔的地理位置，就可以通过这些ID粗略定位手机位置。然而，这仅能由强力部门和情报机构在合法情况下实现。那么能用除蜂窝ID以外的信息定位手机吗？</p>
+<p>现在大多数手机都一直连接在互联网上。通过智能手机，我们用类似于Signal或Whatsapp的服务访问网站，发送信息，检查并回复邮件。任何这样的连接将依赖于一个关联在我们手机上的IP地址进行传输。在我日用的计算机上，我能通过像 <a target="_blank" rel="noopener" href="https://www.iplocation.net/ip-lookup">IPLocation</a>的网站查找我的IP地址，它将显示我最有可能所在的地理位置。当然，这仅在我没有使用代理和虚拟专用网络的情况下有用。不同的数据库在地理位置上可能存在细微差别，但正如在下例中所示，根据我的IP地址，我位于慕尼黑附近的某个地方。</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202402251625939.png"></p>
+<p>为了使这些位置更加直观，我将它们绘制在地图上。在写这篇文章时，我就处于这张图的某个位置上，看起来并不是那么精准，对吧？</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202402251627600.png"></p>
+<p>这是我使用固定线路的结果，那如果通过IP地址定位手机会怎样？获取手机当前的IP地址并不是听上去那么简单的。就算我收到了从目标手机发送而来的电子邮件，那也有很高的概率其并不包含原始IP地址，尤其是从Gmail或Hotmail这种邮件服务商发来的邮件。那么我们如何获取目标手机的实际IP地址？</p>
+<p><em>在继续阅读之前，请注意：下一步在某些国家可能是非法的，并且非常具有侵略性。我绝不是推荐你必须这样积极的达成目标，我只是使用该技术来证明我的观点。</em></p>
+<p>我向目标发送了一个带有追踪像素（Tacking Pixel）的邮件。别担心，所谓的目标是我的一次性手机。在连接到4G（LTE）的情况下，我打开了这封自己发给自己的邮件。追踪像素，也就是所谓的网页臭虫（<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Web_beacon">Web Beacon</a>）,被用于分析一名用户是否访问了位于网页或邮件等内容。这些跟踪器将提供访问时间以及访问内容的 IP 地址等信息。我通过 <a target="_blank" rel="noopener" href="https://www.getnotify.com/">GetNotify</a>网站来获取追踪像素，然后在手机上打开邮件，结果如下：</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202402252119381.png"></p>
+<p>由此可见，追踪像素返回了邮件打开的时间，来自我手机浏览器的User Agent字段以及一个IP地址。此IP地址已经注册到Telefonica Germany，该一次性电话的生产商。让我们在IP地址网站上再确认一下：</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202402252123248.png"></p>
+<p>很好，我们再次看到了慕尼黑，但是还有两个候选城市在地图上。</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202402252124491.png"></p>
+<p>我就在这附近，但是从地图上来看，另外两个城市距离慕尼黑很远。由此可见，由提供商分配给我手机的IP地址似乎提供了一个相当不准确的位置。4G网络的结构能解释一部分原因。</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202402252127881.png"></p>
+<p>手机获取到的动态 IP 地址是由所谓的分组数据网关 （P-GW） 分配的。这基本上是互联网的出口节点，IP地址是随机选择的，其来自于地址池。每次重新连接网络时，即使再次连接到同一小区（用于 LTE eNodeB），您也会从此池中获取一个新的随机地址。IP 地址与网络的任何其他元素（例如手机信号塔 （eNodeB））之间没有直接联系。通常，来自 P-GW 的传出流量会为多个已注册的手机分配相同的 IP 地址。虽然来自手机的连接可能会由区域P-GW处理，但在我的情况下，实际位于慕尼黑的P-GW也可以注册到数百公里外的P-GW。我花了一个小时试图找到一个也使用Telefonica&#x2F;O2的朋友，并请他们协助我。我给她发了一封带有跟踪像素的邮件。以下是返回的内容：</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202402252148050.png"></p>
+<p>这个IP地址据说也来自于慕尼黑，但我的朋友住在附帕绍近，足足170公里远！请记住，这还是在没有代理和虚拟专用网络的情况下。这是我在LTE上通过比利时IP访问互联网的一次性电话：</p>
+<p><img src="https://raw.githubusercontent.com/mrzhang76/MdPicture/master/202402252150014.png"></p>
+<p>总之，通过IP地址对手机进行定位可能会提供一个大致位置（足够幸运的话），但就像其他常规IP地址一样，并不能进行精确定位。我认为，在大多数情况下，固话线路的IP地址所提供的定位比手机IP更加精确。请记住这一点，以便在今后的侦查。</p>
+<p>Matthias Wilson &amp; Nixintel  2020年7月5日</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/OSINT/" rel="tag"># OSINT</a>
+              <a href="/tags/%E7%BF%BB%E8%AF%91/" rel="tag"># 翻译</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/QA-%E9%83%A8%E7%BD%B2HEXO/" rel="prev" title="QA:部署HEXO">
+      <i class="fa fa-chevron-left"></i> QA:部署HEXO
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Mrzhang76</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Mrzhang76</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
