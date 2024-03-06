@@ -175,7 +175,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2024-03-06 15:22:32 / Modified: 15:23:03" itemprop="dateCreated datePublished" datetime="2024-03-06T15:22:32+08:00">2024-03-06</time>
+              <time title="Created: 2024-03-06 15:22:32 / Modified: 15:56:02" itemprop="dateCreated datePublished" datetime="2024-03-06T15:22:32+08:00">2024-03-06</time>
             </span>
 
           
@@ -189,7 +189,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="位运算（C-C-）"><a href="#位运算（C-C-）" class="headerlink" title="位运算（C&#x2F;C++）"></a>位运算（C&#x2F;C++）</h1><h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p><strong>运算符</strong></p>
+          <h1 id="位运算（C-C-）"><a href="#位运算（C-C-）" class="headerlink" title="位运算（C&#x2F;C++）"></a>位运算（C&#x2F;C++）</h1><p>[TOC]</p>
+<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p><strong>运算符</strong></p>
 <ul>
 <li><p>位取反运算符（~）</p>
 </li>
@@ -214,7 +215,7 @@
 <li>其余位数存储实际的值，有符号的正整数和无符号数的存储方式所一样的，都是从 0 开始算起。</li>
 <li>负数的存储方式为2 的 N（数值位的位数） 次方减去它的绝对值。</li>
 </ol>
-<p><strong>位运算的性质：</strong>幂等律、交换律、结合律、分配率、德摩根律、取反运算性质、与运算性质、或运算性质、异或运算性质：</p>
+<p><strong>位运算的性质：</strong>幂等律、交换律、结合律、分配律、德摩根律（对偶律）、取反运算性质、与运算性质、或运算性质、异或运算性质。</p>
 <p><strong>逻辑移位</strong>：移位不考虑符号位。左移高位丢弃，低位补零，不溢出情况下等价于乘以2；右移低位丢弃，高位补0。</p>
 <p><strong>算术移位</strong>：移位考虑符号位。左移高位丢弃，低位补零；右移低位丢弃，高位补<strong>符号位</strong>，等价于除以2，可能发送精度丢失。</p>
 <p><strong>格雷码</strong>：任意两个相邻的代码只有一位二进制数不同。</p>
@@ -244,13 +245,24 @@
 <li>不可以移位的数据类型：double，float，bool，long double</li>
 <li>有符号数字左移、右移其符号位受到的影响依照编译器实现而定，即为不确定的。</li>
 </ul>
-<h2 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h2><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<h2 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/add-binary/">67. 二进制求和</a></li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/bitwise-and-of-numbers-range/">201. 数字范围按位与</a> </li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/single-number/">136. 只出现一次的数字</a></li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/single-number-ii/">137. 只出现一次的数字 II</a> </li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/reverse-bits/">190. 颠倒二进制位</a></li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/number-of-1-bits/">191. 位1的个数</a></li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/1f28078309d7">位运算符</a></li>
 <li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/97749860?utm_id=0">算术移位和逻辑移位详解</a></li>
 <li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/399393773">构造一个一位全加器</a></li>
 <li><a target="_blank" rel="noopener" href="https://learn.microsoft.com/zh-cn/cpp/cpp/left-shift-and-right-shift-operators-input-and-output?view=msvc-170">左移和右移运算符：<code>&lt;&lt;</code> 和 <code>&gt;&gt;</code></a></li>
 <li><a target="_blank" rel="noopener" href="https://dcupqiu.club/?p=311">算法入门——位运算</a></li>
 <li><a target="_blank" rel="noopener" href="https://blog.51cto.com/u_15445690/4720371#qa">关于算术移位，逻辑移位的一些思考</a></li>
+<li><a target="_blank" rel="noopener" href="https://supercodepower.com/De-Morgan-laws">【程序中的数学】利用德摩根定律简化布尔运算</a></li>
+<li>未整理：</li>
+<li><a target="_blank" rel="noopener" href="https://yihuishou.github.io/2019/05/28/672772678/">位运算的常用技巧</a></li>
 </ul>
 
       
